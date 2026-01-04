@@ -100,6 +100,49 @@ function cellClicked(e) {
     checkWin();
 }
 
+function displayRoundInfo() {
+    const popup = document.createElement('div');
+
+    // This attaches the modal OUTSIDE the body → cannot be affected by flex, transform, overflow, etc.
+    const root = document.documentElement;
+
+    popup.style.position = "fixed";
+    popup.style.top = "0";
+    popup.style.left = "0";
+    popup.style.width = "100vw";
+    popup.style.height = "100vh";
+    popup.style.background = "rgba(0,0,0,0.6)";
+    popup.style.display = "flex";
+    popup.style.alignItems = "center";
+    popup.style.justifyContent = "center";
+    popup.style.zIndex = "999999";  // force top-most
+
+    const box = document.createElement("div");
+    box.className = "bg-white text-white p-6 rounded-xl w-80 text-center shadow-2xl";
+
+    box.innerHTML = `
+        <h1 class="text-xl font-bold mb-4">Round ${round} Summary:</h1>
+        <p>
+            Winner: Player ${victory[round-1]}
+            <br>Number of moves: ${moves[round-1]}
+        </p>
+        <button id="closeRoundPopupBtn"
+            class="mt-3 px-4 py-2 rounded-lg hover:bg-gray-600 transition">
+            Continue
+        </button>
+    `;
+
+    popup.appendChild(box);
+
+    // Attach modal to <html> instead of <body>
+    root.appendChild(popup);
+
+    document.getElementById("closeRoundPopupBtn").onclick = () => popup.remove();
+}
+
+
+
+
 // Check for win (5 in a row) or full board
 function checkWin() {
     let dirs = [[0,1],[1,0],[1,1],[-1,1]]; // Right, Down, Diagonal, Anti-diagonal
@@ -121,12 +164,14 @@ function checkWin() {
                         count4();
                         if(round === 1) {
                             victory[0] = 1;
+                            displayRoundInfo();
                             round = 2;
                             header();
                             initializeGrid();
                         }
                         else {
                             victory[1] = 2;
+                            displayRoundInfo();
                             header(true);
                         }
                         return;
